@@ -3,6 +3,7 @@ package src
 import (
 	"bytes"
 	"fmt"
+	"ioutil"
 	"math"
 	"math/rand"
 	"syscall"
@@ -44,6 +45,7 @@ func hogio() {
 }
 
 func hoghdd(size int64) {
+
 	var buffer bytes.Buffer
 	var j int
 	chunk := (1024 * 1024)
@@ -52,6 +54,20 @@ func hoghdd(size int64) {
 		j %= 95
 		j += 32
 		buffer.Write([]byte(string(j)))
+	}
+
+	var file os.File
+	var err error
+
+	for {
+		file, err = ioutil.TempFile("", ".gstress")
+		if err != null {
+			fmt.Println(err)
+		}
+		f.Write(buffer)
+		name := f.Name()
+		f.Close()
+		os.Remove(name)
 	}
 
 }
