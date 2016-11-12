@@ -71,3 +71,9 @@ func hoghdd(size int64) {
 	}
 
 }
+
+func Spawner(cpu,io,hdd,timeout int) {
+
+	var x int
+	for x = 0;
+}

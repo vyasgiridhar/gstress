@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-
+	"runtime"
 	"github.com/urfave/cli"
 )
 
@@ -12,13 +12,14 @@ func main() {
 
 	app := cli.NewApp()
 
-	app.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:        "lang",
-			Value:       "english",
-			Usage:       "language for the greeting",
-			Destination: &language,
+	app.Flags = []cli.Flag
+		cli.IntFlag{
+			Name:        "cpu",
+			Value:       runtime.GOMAXPROCS,
+			Usage:       "Number of cpus to use for stress test",
+			Destination: cpu&,
 		},
+		cli.IntFlag
 	}
 
 	app.Action = func(c *cli.Context) error {
