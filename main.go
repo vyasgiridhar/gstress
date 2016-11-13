@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	var language string
+	var cpu int
 
 	app := cli.NewApp()
 
@@ -19,7 +19,6 @@ func main() {
 			Usage:       "Number of cpus to use for stress test",
 			Destination: cpu&,
 		},
-		cli.IntFlag
 	}
 
 	app.Action = func(c *cli.Context) error {

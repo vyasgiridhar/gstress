@@ -7,18 +7,31 @@ import (
 	"math"
 	"math/rand"
 	"syscall"
+	"time"
 	"unsafe"
 )
 
-func hogcpu() {
+func hogcpu(sig chan bool) {
 	rand.Seed(100)
+	var x bool
 	for {
+		select {
+		case x <- sig:
+			return
+		default:
+		}
 		math.Sqrt(rand.Float64())
 	}
 }
 
-func hogvm() {
+func hogvm(sig chan bool) {
+	var x bool
 	for {
+		select {
+		case x <- sig:
+			return
+		default:
+		}
 		var buffer bytes.Buffer
 		x := 'A'
 		for i := 0; i < 1024; i++ {
@@ -38,13 +51,19 @@ func hogvm() {
 	}
 }
 
-func hogio() {
+func hogio(sig chan bool) {
+	var x bool
 	for {
+		select {
+		case x <- sig:
+			return
+		default:
+		}
 		syscall.Sync()
 	}
 }
 
-func hoghdd(size int64) {
+func hoghdd(sig chan bool) {
 
 	var buffer bytes.Buffer
 	var j int
@@ -58,8 +77,13 @@ func hoghdd(size int64) {
 
 	var file os.File
 	var err error
-
+	var x bool
 	for {
+		select {
+		case x <- sig:
+			return
+		default:
+		}
 		file, err = ioutil.TempFile("", ".gstress")
 		if err != null {
 			fmt.Println(err)
@@ -72,8 +96,45 @@ func hoghdd(size int64) {
 
 }
 
-func Spawner(cpu,io,hdd,timeout int) {
+func cpuWorker(n, timeout int) {
 
-	var x int
-	for x = 0;
+	signal := make(chan bool, 1)
+	for i := 0; i < n; i++ {
+		go hogcpu(signal)
+	}
+	if timeout != 0 {
+
+		time.Sleep(timeout * time.Second)
+		for i := 0; i < n; i++ {
+			signal <- true
+		}
+	}
+	else {
+		for {}
+	}
+
+}
+
+func ioWorker(n, timeout int) {
+	signal := make(chan bool, 1)
+
+	for i := 0; i < n; i++ {
+		go hogio(signal)
+	}
+
+	if timeout != 0 {
+
+		time.Sleep(timeout * time.Second)
+		for i := 0; i < n; i++ {
+			signal <- true
+		}
+	}
+	else {
+		for {}
+	}
+
+
+}
+func Spawner(cpu, io, hdd, timeout int) {
+
 }
