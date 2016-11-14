@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/urfave/cli"
 	"github.com/vyasgiridhar/gstress/src"
 	"os"
@@ -50,7 +51,7 @@ func main() {
 		io := c.Int("io")
 		hdd := c.Int("hdd")
 		timeout := c.Int("timeout")
-
+		fmt.Printf("Started %d cpu workers, %d io worker, %d hdd workers", cpu, io, hdd)
 		src.Spawner(cpu, io, hdd, timeout)
 
 		return nil
