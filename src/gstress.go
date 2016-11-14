@@ -20,7 +20,6 @@ func hogcpu(sig chan bool) {
 			return
 		default:
 		}
-		fmt.Println("Calculating")
 		_ = math.Sqrt(rand.Float64())
 	}
 }
@@ -32,7 +31,6 @@ func hogio(sig chan bool) {
 			return
 		default:
 		}
-		fmt.Println("Syncing")
 		syscall.Sync()
 	}
 }
@@ -58,7 +56,6 @@ func hoghdd(sig chan bool) {
 			return
 		default:
 		}
-		fmt.Println("Writing to file")
 		file, err = ioutil.TempFile("", ".gstress")
 		if err != nil {
 			fmt.Println(err)
