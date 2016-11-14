@@ -24,32 +24,6 @@ func hogcpu(sig chan bool) {
 	}
 }
 
-func hogvm(sig chan bool) {
-	var x bool
-	for {
-		select {
-		case x <- sig:
-			return
-		default:
-		}
-		var buffer bytes.Buffer
-		x := 'A'
-		for i := 0; i < 1024; i++ {
-			buffer.WriteString("A")
-		}
-		time.sleep(1)
-		for i := 0; i < 1024; i++ {
-			{
-				b, err := buffer.ReadByte()
-				if err != nil {
-					if string(b) != "A" {
-						fmt.Println("Memory corruption at %v", unsafe.Pointer(s[i]))
-					}
-				}
-			}
-		}
-	}
-}
 
 func hogio(sig chan bool) {
 	var x bool
@@ -67,7 +41,7 @@ func hoghdd(sig chan bool) {
 
 	var buffer bytes.Buffer
 	var j int
-	chunk := (1024 * 1024)
+	chunk := (1024 * 1024 * 1024)
 	for i := 0; i < chunk-1; i++ {
 		j = rand.Int()
 		j %= 95
@@ -133,6 +107,25 @@ func ioWorker(n, timeout int) {
 		for {}
 	}
 
+}
+
+func hddWorker(n,timeout int) {
+	signal := make(chan bool,1)
+
+	for i := 0 ; i < n ; i++ {
+		go hoghdd(signal)
+	}
+
+	if timeout != 0 {
+
+		time.Sleep(timeout * time.Second)
+		for i := 0; i < n; i++ {
+			signal <- true
+		}
+	}
+	else {
+		for {}
+	}
 
 }
 func Spawner(cpu, io, hdd, timeout int) {
