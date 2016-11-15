@@ -12,30 +12,20 @@ import (
 	"time"
 )
 
-func hogcpu(sig chan bool) {
-	rand.Seed(100)
+func hogcpu() {
+	rand.Seed(1000)
 	for {
-		select {
-		case <-sig:
-			return
-		default:
-		}
 		_ = math.Sqrt(rand.Float64())
 	}
 }
 
-func hogio(sig chan bool) {
+func hogio() {
 	for {
-		select {
-		case <-sig:
-			return
-		default:
-		}
 		syscall.Sync()
 	}
 }
 
-func hoghdd(sig chan bool) {
+func hoghdd() {
 
 	var buffer bytes.Buffer
 	var j int
@@ -51,11 +41,6 @@ func hoghdd(sig chan bool) {
 	var err error
 
 	for {
-		select {
-		case <-sig:
-			return
-		default:
-		}
 		file, err = ioutil.TempFile("", ".gstress")
 		if err != nil {
 			fmt.Println(err)
@@ -70,19 +55,15 @@ func hoghdd(sig chan bool) {
 
 func cpuWorker(n, timeout int, wait *sync.WaitGroup) {
 
-	signal := make(chan bool, 1)
-
 	defer wait.Done()
 
 	for i := 0; i < n; i++ {
-		go hogcpu(signal)
+		go hogcpu()
 	}
 	if timeout != 0 {
 
 		time.Sleep(time.Duration(timeout) * time.Second)
-		for i := 0; i < n; i++ {
-			signal <- true
-		}
+		return
 	} else {
 		for {
 		}
@@ -91,18 +72,14 @@ func cpuWorker(n, timeout int, wait *sync.WaitGroup) {
 }
 
 func ioWorker(n, timeout int, wait *sync.WaitGroup) {
-	signal := make(chan bool, 1)
 	defer wait.Done()
 	for i := 0; i < n; i++ {
-		go hogio(signal)
+		go hogio()
 	}
 
 	if timeout != 0 {
 
 		time.Sleep(time.Duration(timeout) * time.Second)
-		for i := 0; i < n; i++ {
-			signal <- true
-		}
 	} else {
 		for {
 		}
@@ -111,18 +88,14 @@ func ioWorker(n, timeout int, wait *sync.WaitGroup) {
 }
 
 func hddWorker(n, timeout int, wait *sync.WaitGroup) {
-	signal := make(chan bool, 1)
 	defer wait.Done()
 	for i := 0; i < n; i++ {
-		go hoghdd(signal)
+		go hoghdd()
 	}
 
 	if timeout != 0 {
 
 		time.Sleep(time.Duration(timeout) * time.Second)
-		for i := 0; i < n; i++ {
-			signal <- true
-		}
 	} else {
 		for {
 		}
